@@ -7,19 +7,15 @@ from pacman_module.util import *
 
 
 class PacmanAgent(Agent):
-    # seenPos = set()  # position " (1,2) "
-    # path = []  # "[ [(1,2),"South"], ... ]"
-    # fringe = Stack()  # [ [state,"South"] , ... ]
-    # branches = Stack()  # [[state,"south"],..]
-    # counter = 0
-    #
-    # seenFood = []
 
-    fringe = Queue()    # [ [state,"South"] , ... ]
+        # [ [state,"South"] , ... ]
     nodes = list()      # [ [[(5,4),"west"],...,[(5,3),"East"]], ... ,[[(5,4),"west"],...,[(5,3),"East"]] ]
     path = list()       # [ [pos, dir],...,[pos,dir]]
     seenPos = set()    # [pos,...,pos]
     goal = None
+
+    came_from = {}
+    cost_so_far = {}
 
     def __init__(self, args):
         """
@@ -43,6 +39,48 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
 
         """
+        self.goal = compute_goal()
+        return
+
+
+    def a_star_search(self,start,goal) :
+        frontier = PriorityQueue()
+        frontier.push(s,0)
+
+        came_from = {}
+        cost_so_far = {}
+        came_from[s] = None
+        cost_so_far[s] = 0
+
+
+        while not frontier.isEmpty():
+            current = frontier.pop()
+
+            if(self.isFood(current)):
+                break
+
+            for next in s.getPacmanSuccessors():
+                new_cost = cost_so_far[current] + 1
+
+                if next not in cost_so_far or new_cost < cost_so_far[next]:
+                    cost_so_far[next] = new_cost
+                    priority = new_cost + heuristic(self.goal, next)
+                    frontier.push(next,priority)
+                    came_from[next] = current
+
+                    s.getCo
+
+
+
+
+
+
+
+
+
+
+
+
 
         print("New Time Step : \n\n")
         pos = s.getPacmanPosition()
@@ -61,7 +99,7 @@ class PacmanAgent(Agent):
             print("Clear all and recompute path...")
 
             self.path.clear()
-            self.fringe = Stack()
+            self.fringe = PriorityQueue()
             self.nodes.clear()
             self.seenPos = set()
             self.goal = None
@@ -76,19 +114,10 @@ class PacmanAgent(Agent):
 
             self.seenPos.add(pos)
 
-            # for i in range (0, len(succs) - 1):
-            #     # self.nodes.append([pos,[[succs[i],succs[i][1]]]])
-            #     # self.nodes.append([succs[i][0].getPacmanPosition(),[[succs[i][0].getPacmanPosition(),succs[i][1]]]])
-            #     # self.nodes.append([succs[i][0].getPacmanPosition(),[[s.getPacmanPosition(),]]])
-            #     self.nodes.append([[succs[i][0].getPacmanPosition(),succs[i][1]]])
-            #     self.fringe.push(succs[i])
-            #
-            for succ in succs:
-                # self.nodes.append([pos,[[succs[i],succs[i][1]]]])
-                # self.nodes.append([succs[i][0].getPacmanPosition(),[[succs[i][0].getPacmanPosition(),succs[i][1]]]])
-                # self.nodes.append([succs[i][0].getPacmanPosition(),[[s.getPacmanPosition(),]]])
-                self.nodes.append([[succ[0].getPacmanPosition(),succ[1]]])
-                self.fringe.push(succ)
+            for i in (0, len(succs) - 1):
+
+                self.nodes.append([[succs[i][0].getPacmanPosition(),succs[i][1]]])
+                self.fringe.push(succs[i])
 
         curr = s
         prev = s
@@ -97,78 +126,33 @@ class PacmanAgent(Agent):
         while not self.fringe.isEmpty():
 
             print("-------- new loop\n\n")
-            # print("Fringe before pop = ", self.fringe.list)
-            # print("path = ", self.path)
+
 
             prev = curr
 
             [curr, currDir] = self.fringe.pop()
-
-            # print("Fringe after pop = ", self.fringe.list)
-            # # print("this is the fringe !! " ,self.fringe.list)
-            # print("curr pos = ", curr.getPacmanPosition())
-            # print("Curr State\n", curr)
-            # # Take the first element in the fringe
 
             currPos = curr.getPacmanPosition() # ie. (4 , 5)
 
             # Considere the element as "Seen" to avoid loop
             self.seenPos.add(currPos)
 
-
-            # self.path.append([curr.getPacmanPosition(), currDir])
-
-
-            # is there food ?
-            # print("prev\n",prev)
-            # print(currPos)
-            # print("Food: ",prev.getFood())
             if (prev.getFood()[currPos[0] ][currPos[1] ]):
                 print("Found food at: " , str(currPos))
 
                 # Define curr node as the final one
                 self.goal = currPos
-                # print("Goal = ", self.goal)
 
                 k = [j[0][0] for j in self.nodes ].index(currPos)
                 self.path = list(self.nodes[k])
-
-
-
-                # compute the first move to make to reach goal
-
-                # k = [j[0] for j in self.nodes].index(self.goal)
-                # currPath = self.nodes[k][1]
-                # print(self.path)
                 length = len(self.path)
                 return self.path[length-1][1]
 
-
-                # check if it is a food that we already ate?
-
-                # if not curr.getPacmanPosition() in self.seenFood:
-                #     self.seenFood.append(curr.getPacmanPosition())
-                #     return self.path[0][1]
-
-
-            # print("SeenPos :", self.seenPos)
             allSuccs = curr.generatePacmanSuccessors()
             if len(allSuccs) == 0:
                 print("Error : It should always exist at least one successor")
 
-
-            # print("All      ", [i[0].getPacmanPosition() for i in allSuccs])
-            succs = self.removeSeenFromSuccessor(allSuccs)
-            # print("Succs    ", [i[0].getPacmanPosition() for i in succs])
-
-            # if (len(succs) > 1):
-            #     for i in (1, len(succs) - 1):
-            #         self.branches.push(curr)
-
-            # if (len(succs) == 0):
-            #     if (not self.branches.isEmpty()):
-            #         currBranch = self.branches.pop()
-            #         self.removeInPathUntil(currBranch)
+           succs = self.removeSeenFromSuccessor(allSuccs)
 
             for succ in succs:
                 if succ[0].getPacmanPosition() not in self.seenPos:
@@ -191,17 +175,11 @@ class PacmanAgent(Agent):
                     # self.nodes.append([succ[0].getPacmanPosition(),currPath])
                     self.fringe.push(succ)
 
+        def isFood(self, current):
+            pass
 
-    # def removeInPathUntil(self, s):
-    #     # print("old path = ",self.path)
-    #     i = [i[0] for i in self.path].index(s.getPacmanPosition())
-    #
-    #     newPath = self.path[0: i+1]  # Possible error here with the i or i+1 ----> todo: check if it works
-    #     self.path = newPath
-    #     # print("new path = ", self.path)
-    #     return
 
-    def removeSeenFromSuccessor(self, succs):
+def removeSeenFromSuccessor(self, succs):
 
         for currPos in self.seenPos:
             # print("curr seen :\n ", curr)
@@ -220,3 +198,11 @@ class PacmanAgent(Agent):
                 # print("succ in  removeFrom... : ",[i[0].getPacmanPosition() for i in succs])
 
         return succs
+
+
+# Manatan distance has heuristic
+    def heuristic(self,state1,state2):
+        (x1,y1) = state1.getPacmanPosition()
+        (x2,y2) = state2.getPacmanPosition()
+
+        return abs(x1-x2) + abs(y1-y2)

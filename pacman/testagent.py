@@ -93,7 +93,6 @@ class PacmanAgent(Agent):
         for i in (0, len(succs) - 1):
 
             try:
-                b = seen.index(succs[i][0].getPacmanPosition())
             except ValueError:
 
                 seen.append(succs[i][0].getPacmanPosition())
