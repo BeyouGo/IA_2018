@@ -31,63 +31,48 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
         """
 
-        if len(self.path) == 0 :
-            self.path,last = self.dfs(state)
-            self.path = self.reconstrucPath(last)
+        if len(self.path) == 0:
+            self.path, last = self.dfs(state)
+            self.path = self.reconstruc_path(last)
 
         direction = self.path.pop(state)
-        print(direction)
         return direction
 
-
-
-    def dfs(self,state):
+    def dfs(self, state):
 
         path = {}
-        costs = {}
         fringe = util.Stack()
         expanded = set()
 
-        last = [None,None]
+        last = [None, None]
         expanded.add((state.getPacmanPosition(), state.getFood()))
 
         path[state] = [None, None]
-        costs[(state.getPacmanPosition(),state.getFood())] = 0
         fringe.push(state)
 
         while not fringe.isEmpty():
             current = fringe.pop()
             expanded.add((current.getPacmanPosition(), current.getFood()))
 
-            if(current.isWin()):
+            if current.isWin():
                 last = current
                 break
 
+            # Add in the fringe is the node hasn't be expanded yet with the same food configuration
             for successor, direction in current.generatePacmanSuccessors():
-                if not (successor.getPacmanPosition(),successor.getFood()) in expanded:
-                    succCost = (costs[(current.getPacmanPosition(),current.getFood())] + 1)
-                    costs[(successor.getPacmanPosition(),successor.getFood())] = succCost
+                if not (successor.getPacmanPosition(), successor.getFood()) in expanded:
                     fringe.push(successor)
-
                     path[successor] = [current, direction]
 
-        return path,last
+        return path, last
 
+    # Reconstruct the path to ease the access of direction
+    def reconstruc_path(self, goal):
 
+        new_path = {}
+        predecessor, direction = self.path[goal]
 
-    def reconstrucPath(self,goal):
-
-        newPath = {}
-        # print("path: ",self.path)
-        # print("Goal:",goal)
-        predecessor,direction = self.path[goal]
-
-        while predecessor != None:
-            newPath[predecessor] = direction
-            predecessor,direction = self.path[predecessor]
-            # print(predecessor)
-
-        print("new Path: ",newPath)
-        return newPath
-
-
+        while predecessor is not None:
+            new_path[predecessor] = direction
+            predecessor, direction = self.path[predecessor]
+        return new_path

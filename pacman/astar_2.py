@@ -33,15 +33,13 @@ class PacmanAgent(Agent):
 
         if len(self.path) == 0 :
             self.path = self.astar(state,self.findFoodPos(state))
-            print(self.path)
+            self.path = self.reconstrucPath(self.findFoodPos(state))
 
-        val = self.path.values()
-        print("val : " ,val)
-        s,direction = self.path[state.getPacmanPosition()]
-
-
+        direction = self.path.pop(state.getPacmanPosition())
 
         return direction
+
+
 
 
     def findFoodPos(self,state):
@@ -61,7 +59,7 @@ class PacmanAgent(Agent):
         return len(foods) == 0
 
 
-    # def heuristic(self,state):
+    # def heuristic(self,state,goal):
     #
     #     foods = []
     #     for i in range (0, state.getFood().width-1):
@@ -85,14 +83,19 @@ class PacmanAgent(Agent):
         heuristic = util.manhattanDistance(state.getPacmanPosition(), goal)
         return heuristic
 
-    # def reconstrucPath(self,state,goal,path):
-    #
-    #     newPath = {}
-    #
-    #     predecessor,direction = path[goal]
-    #
-    #     while predecessor != state.getPacmanPosition():
-    #         newPath
+    def reconstrucPath(self,goal):
+
+        newPath = {}
+        print("path: ",self.path)
+        print("Goal:",goal)
+        predecessor,direction = self.path[goal]
+
+        while predecessor != None:
+            newPath[predecessor] = direction
+            predecessor,direction = self.path[predecessor]
+
+        print("new Path: ",newPath)
+        return newPath
 
 
 
@@ -104,7 +107,7 @@ class PacmanAgent(Agent):
         costs = {}
         path = {}
 
-        path[state] = (None,None)
+        path[state.getPacmanPosition()] = [None,None]
         costs[state.getPacmanPosition()] = 0
         fringe.push(state,costs[state.getPacmanPosition()]+self.heuristic(state,goal) )
 
@@ -128,7 +131,7 @@ class PacmanAgent(Agent):
                     costs[successor.getPacmanPosition()] = succCost
                     fringe.push(successor,succCost + self.heuristic(successor,goal))
 
-                    path[successor] = [currState.getPacmanPosition(), direction]
+                    path[successor.getPacmanPosition()] = [currState.getPacmanPosition(), direction]
 
 
         return path

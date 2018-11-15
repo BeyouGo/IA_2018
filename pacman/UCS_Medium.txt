@@ -1,0 +1,7 @@
+-path+eaten 	= 172 - 537 
+getScore() 		= 172 - 261182
+-path-eaten 	= 541 - 184
+-getScore() 	= 562 - 1383
+path-eaten 		= 570 - 32528
+path 			= 570 - 40508
+path+eaten 		= 570 - 45977

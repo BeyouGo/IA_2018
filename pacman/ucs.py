@@ -31,63 +31,51 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
         """
 
-        if len(self.path) == 0 :
-            self.path,last = self.bfs(state)
-            self.path = self.reconstrucPath(last)
+        if len(self.path) == 0:
+            self.path, last = self.bfs(state)
+            self.path = self.reconstruc_path(last)
 
         direction = self.path.pop(state)
-        print(direction)
         return direction
 
-
-
-    def bfs(self,state):
+    def bfs(self, state):
 
         path = {}
         costs = {}
         fringe = util.PriorityQueue()
         expanded = set()
 
-        last = [None,None]
+        last = [None, None]
         expanded.add((state.getPacmanPosition(), state.getFood()))
 
         path[state] = [None, None]
-        costs[(state.getPacmanPosition(),state.getFood())] = 0
-        fringe.push(state,0)
+        costs[(state.getPacmanPosition(), state.getFood())] = 0
+        fringe.push(state, 0)
 
         while not fringe.isEmpty():
-            oldCost,current = fringe.pop()
+            old_cost, current = fringe.pop()
             expanded.add((current.getPacmanPosition(), current.getFood()))
 
-            if(current.isWin()):
+            if current.isWin():
                 last = current
                 break
 
             for successor, direction in current.generatePacmanSuccessors():
-                if not (successor.getPacmanPosition(),successor.getFood()) in expanded:
-                    succCost = (costs[(current.getPacmanPosition(),current.getFood())] + 1)
-                    costs[(successor.getPacmanPosition(),successor.getFood())] = succCost
-                    fringe.push(successor,succCost)
+                if not (successor.getPacmanPosition(), successor.getFood()) in expanded:
+                    succ_cost = (costs[(current.getPacmanPosition(), current.getFood())] + 1)
+                    costs[(successor.getPacmanPosition(), successor.getFood())] = succ_cost
+                    fringe.push(successor, succ_cost)
 
                     path[successor] = [current, direction]
 
-        return path,last
+        return path, last
 
+    def reconstruc_path(self, goal):
 
+        new_path = {}
+        predecessor, direction = self.path[goal]
 
-    def reconstrucPath(self,goal):
-
-        newPath = {}
-        # print("path: ",self.path)
-        # print("Goal:",goal)
-        predecessor,direction = self.path[goal]
-
-        while predecessor != None:
-            newPath[predecessor] = direction
-            predecessor,direction = self.path[predecessor]
-            # print(predecessor)
-
-        print("new Path: ",newPath)
-        return newPath
-
-
+        while predecessor is not None:
+            new_path[predecessor] = direction
+            predecessor, direction = self.path[predecessor]
+        return new_path
