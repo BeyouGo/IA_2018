@@ -15,12 +15,12 @@ class PacmanAgent(Agent):
         ----------
         - `args`: Namespace of arguments from command-line prompt.
         """
-        self.args = args
-        self.pacmanIndex = 0
-        self.ghostIndex = 1
-
-        self.agentCount = 2
-        self.depth = 3
+        # self.args = args
+        # self.pacmanIndex = 0
+        # self.ghostIndex = 1
+        #
+        # self.agentCount = 2
+        # self.depth = 3
 
         self.seen = []
 
@@ -40,6 +40,9 @@ class PacmanAgent(Agent):
         # trueDepth = self.agentCount * self.depth
 
         # Get first pacman successors
+        self.seen = []
+
+
         succsDirectionPair = s.generatePacmanSuccessors()
         succs = [succ[0] for succ in succsDirectionPair]
         moves = [succ[1] for succ in succsDirectionPair]
@@ -48,6 +51,7 @@ class PacmanAgent(Agent):
 
         maxV = max(v)
         index = v.index(maxV)
+
         return moves[index]
 
     def value(self, gameState, agentIndex, depth):
@@ -59,13 +63,13 @@ class PacmanAgent(Agent):
 
 
 
-        if self.already_seen_state(gameState):
+        if self.already_seen_state(gameState,agentIndex):
             if agentIndex == 0:
                 return -1e80
             else:
                 return 1e80
 
-        self.add_seen_state(gameState)
+        self.add_seen_state(gameState,agentIndex)
 
         if gameState.isLose() or gameState.isWin():
             return gameState.getScore()
@@ -98,14 +102,14 @@ class PacmanAgent(Agent):
 
         return v
 
-    def add_seen_state(self, game_state):
-        print((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0]))
-        self.seen.append((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0]))
+    def add_seen_state(self, game_state,agent_index):
+        print((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index))
+        self.seen.append((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index))
 
-    def already_seen_state(self, game_state):
+    def already_seen_state(self, game_state,agent_index):
         # print("Enter Already Seen State :")
         if (self.seen.count(
-                (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0])) > 0):
+                (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index)) > 0):
             # print("\t" + str((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0])))
             # print("already seen ")
             return True
