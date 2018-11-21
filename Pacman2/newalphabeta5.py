@@ -41,7 +41,7 @@ class PacmanAgent(Agent):
 
         # Get first pacman successors
         self.seen = []
-
+        self.add_seen_state(s,0)
         succsDirectionPair = s.generatePacmanSuccessors()
         succs = [succ[0] for succ in succsDirectionPair]
         moves = [succ[1] for succ in succsDirectionPair]
