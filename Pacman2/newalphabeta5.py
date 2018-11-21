@@ -42,7 +42,6 @@ class PacmanAgent(Agent):
         # Get first pacman successors
         self.seen = []
 
-
         succsDirectionPair = s.generatePacmanSuccessors()
         succs = [succ[0] for succ in succsDirectionPair]
         moves = [succ[1] for succ in succsDirectionPair]
@@ -56,14 +55,13 @@ class PacmanAgent(Agent):
 
     def value(self, gameState, agentIndex, alpha, beta):
 
-
-        if self.already_seen_state(gameState,agentIndex):
+        if self.already_seen_state(gameState, agentIndex):
             if agentIndex == 0:
                 return -1e80
             else:
                 return 1e80
 
-        self.add_seen_state(gameState,agentIndex)
+        self.add_seen_state(gameState, agentIndex)
 
         if gameState.isLose() or gameState.isWin():
             # return self.scoreEvaluationFunction(gameState)
@@ -80,8 +78,8 @@ class PacmanAgent(Agent):
         succsDirectionPair = gameState.generatePacmanSuccessors()
         succs = [succ[0] for succ in succsDirectionPair]
         for succ in succs:
-            v=max([self.value(succ, 1, alpha, beta)])
-            if v>=beta:
+            v = max(self.value(succ, 1, alpha, beta),v)
+            if v >= beta:
                 return v
             alpha = max(alpha, v)
         return v
@@ -91,25 +89,23 @@ class PacmanAgent(Agent):
         succsDirectionPair = gameState.generateGhostSuccessors(agentIndex)
         succs = [succ[0] for succ in succsDirectionPair]
         for succ in succs:
-            v=min([self.value(succ, 0, alpha, beta)])
-            if v<=alpha:
+            v = min(self.value(succ, 0, alpha, beta),v)
+            if v <= alpha:
                 return v
-            beta=min(beta, v)
+            beta = min(beta, v)
         return v
 
-    def add_seen_state(self, game_state,agent_index):
-        print((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index))
-        self.seen.append((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index))
+    def add_seen_state(self, game_state, agent_index):
+        # print((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0], agent_index))
+        self.seen.append(
+            (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0], agent_index))
 
-    def already_seen_state(self, game_state,agent_index):
+    def already_seen_state(self, game_state, agent_index):
         # print("Enter Already Seen State :")
-        if (self.seen.count(
-                (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index)) > 0):
-            # print("\t" + str((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0])))
-            # print("already seen ")
-            return True
-        else:
-            return False
+        return (self.seen.count(
+                (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],
+                 agent_index)) > 0)
+
 
     def scoreEvaluationFunction(self, currentGameState):
 

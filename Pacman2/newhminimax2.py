@@ -20,7 +20,7 @@ class PacmanAgent(Agent):
         # self.ghostIndex = 1
         #
         # self.agentCount = 2
-        self.depth = 3
+        self.depth = 5
 
         self.seen = []
 
@@ -149,7 +149,7 @@ class PacmanAgent(Agent):
         # else:
         #     distghost = util.manhattanDistance(pos, posghost)
 
-        evfun =  - numfood * 20 - nearfooddist*10  #+ current_game_state.getScore()/100 #- nearfooddist * 1.5  #- (1/distghost)*10
+        evfun =  - numfood * 10 - nearfooddist*1.5  + current_game_state.getScore() #- nearfooddist * 1.5  #- (1/distghost)*10
         # evfun = self.heuristic(current_game_state)
         return evfun
 

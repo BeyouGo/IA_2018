@@ -66,8 +66,8 @@ class PacmanAgent(Agent):
         self.add_seen_state(gameState,agentIndex)
 
         if gameState.isLose() or gameState.isWin():
-            return gameState.getScore()
-            # return self.scoreEvaluationFunction(gameState)
+            # return gameState.getScore()
+            return self.scoreEvaluationFunction(gameState)
 
         if agentIndex == 0:
             return self.max_value(gameState, alpha, beta)

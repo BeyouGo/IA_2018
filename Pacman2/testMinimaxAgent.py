@@ -3,8 +3,6 @@ import sys
 
 from pacman_module.game import Agent, random, Directions
 
-numOfExpandedStates = 0
-
 sys.setrecursionlimit(1000)
 class PacmanAgent(Agent):
     def __init__(self, args):
@@ -18,7 +16,8 @@ class PacmanAgent(Agent):
         self.ghostIndex = 1
 
         self.agentCount = 2
-        self.depth = 3
+        self.depth = 5
+        self.seen = []
 
     def get_action(self, s):
         """
@@ -33,8 +32,6 @@ class PacmanAgent(Agent):
         -------
         - A legal move as defined in `game.Directions`.
         """
-        print( random.randint(0, 5 - 1))
-
         s.generatePacmanSuccessors()
         s.generateGhostSuccessors(self.pacmanIndex)
         s.getLegalActions(self.pacmanIndex)
@@ -55,6 +52,9 @@ class PacmanAgent(Agent):
         succs = [succ[0] for succ in succsDirectionPair]
         moves = [succ[1] for succ in succsDirectionPair]
 
+        self.seen = []
+        self.add_seen_state(s,0)
+
         # LegalActions = gameState.getLegalActions(0)
         # if Directions.STOP in LegalActions:
         #     LegalActions.remove(Directions.STOP)
@@ -64,7 +64,7 @@ class PacmanAgent(Agent):
         # get the minimax value as a
         v = [self.MiniMax_Value(self.agentCount, 1, nextState, trueDepth - 1) for nextState in succs]
 
-        print(v)
+        print(str(moves) + " <-> "+str(v))
         maxV = max(v)
         index = v.index(maxV)
         # listMax = []
@@ -80,13 +80,20 @@ class PacmanAgent(Agent):
 
     def MiniMax_Value(self, numOfAgent, agentIndex, gameState, depth):
 
-        global numOfExpandedStates
 
         LegalActions = gameState.getLegalActions(agentIndex)
         listNextStates = [gameState.generateSuccessor(agentIndex, action) for action in LegalActions]
-        numOfExpandedStates += len(listNextStates)
-        print("Number of states expanded = " + str(numOfExpandedStates))
-        if gameState.isLose() or gameState.isWin() or depth == 0: #
+
+        # if self.already_seen_state(gameState, agentIndex):
+        #     if agentIndex == 0:
+        #         return 1e80
+        #     else:
+        #         return -1e80
+        #
+        # self.add_seen_state(gameState, agentIndex)
+
+
+        if gameState.isLose() or gameState.isWin() : #
             return self.scoreEvaluationFunction(gameState)
         else:
 
@@ -109,3 +116,15 @@ class PacmanAgent(Agent):
           (not reflex agents).
         """
         return currentGameState.getScore()
+
+
+    def add_seen_state(self, game_state, agent_index):
+        # print((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0], agent_index))
+        self.seen.append(
+            (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0], agent_index))
+
+    def already_seen_state(self, game_state, agent_index):
+        # print("Enter Already Seen State :")
+        return (self.seen.count(
+                (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],
+                 agent_index)) > 0)
