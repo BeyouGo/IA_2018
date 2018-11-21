@@ -59,14 +59,15 @@ class PacmanAgent(Agent):
 
         if self.already_seen_state(gameState,agentIndex):
             if agentIndex == 0:
-                return -1e80
-            else:
                 return 1e80
+            else:
+                return -1e80
 
         self.add_seen_state(gameState,agentIndex)
 
         if gameState.isLose() or gameState.isWin():
-            return self.scoreEvaluationFunction(gameState)
+            return gameState.getScore()
+            # return self.scoreEvaluationFunction(gameState)
 
         if agentIndex == 0:
             return self.max_value(gameState, alpha, beta)
@@ -97,7 +98,7 @@ class PacmanAgent(Agent):
         return v
 
     def add_seen_state(self, game_state,agent_index):
-        print((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index))
+        # print((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index))
         self.seen.append((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index))
 
     def already_seen_state(self, game_state,agent_index):

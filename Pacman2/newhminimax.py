@@ -18,7 +18,7 @@ class PacmanAgent(Agent):
         self.ghostIndex = 1
 
         self.agentCount = 2
-        self.depth = 3
+        self.depth = 4
 
     def get_action(self, s):
         """

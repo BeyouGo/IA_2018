@@ -15,13 +15,8 @@ class PacmanAgent(Agent):
         ----------
         - `args`: Namespace of arguments from command-line prompt.
         """
-        # self.args = args
         self.pacmanIndex = 0
         self.ghostIndex = 1
-        #
-        # self.agentCount = 2
-        # self.depth = 3
-
         self.seen = []
 
     def get_action(self, s):

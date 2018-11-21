@@ -20,7 +20,7 @@ class PacmanAgent(Agent):
         # self.ghostIndex = 1
         #
         # self.agentCount = 2
-        self.depth = 3
+        self.depth = 4
 
         self.seen = []
 
@@ -46,7 +46,7 @@ class PacmanAgent(Agent):
         succs = [succ[0] for succ in succsDirectionPair]
         moves = [succ[1] for succ in succsDirectionPair]
 
-        v = [self.value(nextGameState, 1, self.depth) for nextGameState in succs]
+        v = [self.value(nextGameState, 1, self.depth, -1e80, 1e80) for nextGameState in succs]
 
         maxV = max(v)
         print(maxV)
@@ -54,83 +54,64 @@ class PacmanAgent(Agent):
 
         return moves[index]
 
-    def value(self, gameState, agentIndex, depth):
+    def value(self, gameState, agentIndex, depth, alpha, beta):
 
         if gameState.isLose() or gameState.isWin() or depth == 0:
             return self.scoreEvaluationFunction(gameState)
             # return gameState.getScore()
 
-        if self.already_seen_state(gameState, agentIndex,depth):
-            if agentIndex == 0:
-                return 1e80
-            else:
-                return -1e80
-
-        self.add_seen_state(gameState, agentIndex,depth)
+        # if self.already_seen_state(gameState, agentIndex,depth):
+        #     if agentIndex == 0:
+        #         return -1e80
+        #     else:
+        #         return 1e80
+        #
+        # self.add_seen_state(gameState, agentIndex,depth)
 
 
         if agentIndex == 0:
-            return self.max_value(gameState,agentIndex, depth-1)
+            return self.max_value(gameState, agentIndex, depth, alpha, beta)
 
         if agentIndex > 0:
-            return self.min_value(gameState, agentIndex,depth)
+            return self.min_value(gameState, agentIndex, depth, alpha, beta)
 
-    def max_value(self, game_state, agent_index,depth):
-        # print("enter to max")
-
+    def max_value(self, game_state, agent_index, depth, alpha, beta):
+        v = -1e80
         succs_direction_pair = game_state.generatePacmanSuccessors()
         succs = [succ[0] for succ in succs_direction_pair]
-
-        v = max([self.value(succ, 1,depth) for succ in succs])
-
-        # print("Max with agent " + str(agent_index) + " <-> " + str(v))
+        for succ in succs:
+            v = max([self.value(succ, 1, depth - 1, alpha, beta)])
+            if v >= beta:
+                return v
+            alpha = max(alpha, v)
         return v
 
-    def min_value(self, game_state, agent_index,depth):
-        # print("enter to min")
-
-        succs_direction_pair = game_state.generateGhostSuccessors(1)
-        # print(succs_direction_pair)
+    def min_value(self, game_state, agent_index, depth, alpha, beta):
+        v = 1e80
+        succs_direction_pair = game_state.generateGhostSuccessors(agent_index)
         succs = [succ[0] for succ in succs_direction_pair]
-
-        v = min([self.value(succ, 0,depth) for succ in succs])
-
-        # print("Min with agent " + str(agent_index) + " <-> " + str(v))
+        for succ in succs:
+            v = min([self.value(succ, 0, depth, alpha, beta)])
+            if v <= alpha:
+                return v
+            beta = min(beta, v)
         return v
-    # def max_value(self, game_state, depth):
-    #     # print("enter to max")
-    #
-    #
-    #     succs_direction_pair = game_state.generatePacmanSuccessors()
-    #     succs = [succ[0] for succ in succs_direction_pair]
-    #
-    #     v = max([self.value(succ, 1, depth) for succ in succs])
-    #
-    #     return v
-    #
-    # def min_value(self, game_state, agent_index, depth):
-    #     # print("enter to min")
-    #
-    #
-    #     succs_direction_pair = game_state.generateGhostSuccessors(agent_index)
-    #     succs = [succ[0] for succ in succs_direction_pair]
-    #
-    #     v = min([self.value(succ, 0, depth) for succ in succs])
-    #
-    #     return v
 
-    def add_seen_state(self, game_state, agent_index,depth):
+
+
+    def add_seen_state(self, game_state, agent_index, depth):
         # print((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index))
         self.seen.append(
-            (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0], agent_index,depth))
+            (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0], agent_index,
+             depth))
 
-    def already_seen_state(self, game_state, agent_index,depth):
+    def already_seen_state(self, game_state, agent_index, depth):
         # print("Enter Already Seen State :")
         return (self.seen.count(
-                (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],
-                 agent_index,depth)) > 0)
-            # print("\t" + str((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0])))
-            # print("already seen ")
+            (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],
+             agent_index, depth)) > 0)
+        # print("\t" + str((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0])))
+        # print("already seen ")
 
     def scoreEvaluationFunction(self, current_game_state):
         foodlist = current_game_state.getFood().asList()
@@ -149,10 +130,10 @@ class PacmanAgent(Agent):
         # else:
         #     distghost = util.manhattanDistance(pos, posghost)
 
-        evfun =  - numfood * 20 - nearfooddist*10  #+ current_game_state.getScore()/100 #- nearfooddist * 1.5  #- (1/distghost)*10
+        evfun = - numfood * 20 - nearfooddist * 10 -distghost  #  + current_game_state.getScore() - nearfooddist * 1.5  #- (1/distghost)*10
         # evfun = self.heuristic(current_game_state)
+       # evfun = current_game_state.getScore()
         return evfun
-
 
     def heuristic(self, state):
 

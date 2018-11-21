@@ -34,6 +34,8 @@ class PacmanAgent(Agent):
         -------
         - A legal move as defined in `game.Directions`.
         """
+
+        self.seen = []
         print( random.randint(0, 5 - 1))
 
         s.generatePacmanSuccessors()
@@ -66,6 +68,15 @@ class PacmanAgent(Agent):
 
         global numOfExpandedStates
 
+
+
+        if self.already_seen_state(gameState, agentIndex,depth):
+            if agentIndex == 0:
+                return 1e80
+            else:
+                return -1e80
+
+        self.add_seen_state(gameState, agentIndex,depth)
         LegalActions = gameState.getLegalActions(agentIndex)
         if (agentIndex == 0):
             if Directions.STOP in LegalActions:
@@ -74,8 +85,13 @@ class PacmanAgent(Agent):
         numOfExpandedStates += len(listNextStates)
         print("Number of states expanded = " + str(numOfExpandedStates))
 
+
+
+
+
+
         # terminal test
-        if (gameState.isLose() or gameState.isWin() or depth == 0):
+        if (gameState.isLose() or gameState.isWin() ):
             return self.scoreEvaluationFunction(gameState,agentIndex)
         else:
             # if Pacman
@@ -133,3 +149,15 @@ class PacmanAgent(Agent):
         evfun =currentGameState.getScore()-nearfooddist-numfood*1000-distghost
         print("evfun: ",evfun)
         return evfun
+
+    def add_seen_state(self, game_state, agent_index, depth):
+        # print((game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],agent_index))
+        self.seen.append(
+            (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0], agent_index,
+             depth))
+
+    def already_seen_state(self, game_state, agent_index, depth):
+        # print("Enter Already Seen State :")
+        return (self.seen.count(
+            (game_state.getPacmanPosition(), game_state.getFood(), game_state.getGhostPositions()[0],
+             agent_index, depth)) > 0)
