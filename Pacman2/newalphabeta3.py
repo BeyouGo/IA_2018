@@ -47,7 +47,7 @@ class PacmanAgent(Agent):
         succs = [succ[0] for succ in succsDirectionPair]
         moves = [succ[1] for succ in succsDirectionPair]
 
-        v = [self.value(nextGameState, 1, -1e80, 1e80) for nextGameState in succs]
+        v = [self.value(nextGameState, 0, -1e80, 1e80) for nextGameState in succs]
 
         maxV = max(v)
         index = v.index(maxV)
