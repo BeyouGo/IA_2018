@@ -48,7 +48,7 @@ class PacmanAgent(Agent):
         return moves[index]
 
     def max_value(self, game_state, agent_index, alpha, beta):
-        print("enter to max")
+        # print("enter to max")
         if game_state.isLose() or game_state.isWin():
             return self.scoreEvaluationFunction(game_state)
         if self.already_seen_state(game_state, agent_index):
@@ -67,7 +67,7 @@ class PacmanAgent(Agent):
         return v
 
     def min_value(self, game_state, agent_index, alpha, beta):
-        print("enter to min")
+        # print("enter to min")
         if game_state.isLose() or game_state.isWin():
             return self.scoreEvaluationFunction(game_state)
         if self.already_seen_state(game_state, agent_index):
@@ -92,7 +92,7 @@ class PacmanAgent(Agent):
                  agent_index))
 
     def already_seen_state(self, game_state, agent_index):
-        print("Enter Already Seen State :", game_state)
+        # print("Enter Already Seen State :", game_state)
         if (self.seen.count(
                 (game_state.getFood(), game_state.getPacmanPosition(), game_state.getGhostPositions()[0],
                  agent_index)) > 0):
