@@ -31,66 +31,58 @@ class PacmanAgent(Agent):
         -------
         - A legal move as defined in `game.Directions`.
         """
-        # Get first pacman successors
-        self.seen = []
-        self.add_seen_state(s, self.pacmanIndex)
 
-        # simulate pacman turn
+        # Clear seen list and add current state to new seen list
+        self.seen = []
+        self.add_seen_state(s, 0)
+
+        # Generate pacman successor
         succsDirectionPair = s.generatePacmanSuccessors()
         succs = [succ[0] for succ in succsDirectionPair]
         moves = [succ[1] for succ in succsDirectionPair]
 
         # Compute value for each of the pacman moves
-        v = [self.min_value(succ, -self.infinity, self.infinity) for succ in succs]
+        v = [self.min_value(succ) for succ in succs]
 
         # return best one
         maxV = max(v)
         index = v.index(maxV)
         return moves[index]
 
-    # Pacman turn
-    def max_value(self, game_state, alpha, beta):
+    def max_value(self, game_state):
 
-        # Check if game ended
+        # Check if game ended or max depth occures
         if game_state.isLose() or game_state.isWin():
-            # return self.scoreEvaluationFunction(game_state)
-            return game_state.getScore()
+            return self.scoreEvaluationFunction(game_state)
 
-        # Avoid Loops
+        # Avoid loops
         if self.already_seen_state(game_state, self.pacmanIndex):
             return -self.infinity
-
         self.add_seen_state(game_state, self.pacmanIndex)
 
-        # Applying alphabeta pruning
-        v = -self.infinity
+        # Apply minimax (Min)
+        v = - self.infinity
         for (succ, move) in game_state.generatePacmanSuccessors():
-            v = max((self.min_value(succ, alpha, beta), v))
-            if v >= beta:
-                return v
-            alpha = max(alpha, v)
+            v = max((self.min_value(succ), v))
+
         return v
 
-    # Ghost turn
-    def min_value(self, game_state, alpha, beta):
+    def min_value(self, game_state):
 
-        # Check if game ended
+        # Check if game ended or max depth occures
         if game_state.isLose() or game_state.isWin():
-            return self.score_evaluation_function(game_state)
+            return game_state.getScore()
+            # return self.scoreEvaluationFunction(game_state)
 
-        # Avoid Loops
+        # Avoid loops
         if self.already_seen_state(game_state, self.ghostIndex):
             return self.infinity
-
         self.add_seen_state(game_state, self.ghostIndex)
 
-        # Applying alphabeta pruning
+        # Apply minimax (Max)
         v = self.infinity
         for (succ, move) in game_state.generateGhostSuccessors(1):
-            v = min(self.max_value(succ, alpha, beta), v)
-            if v <= alpha:
-                return v
-            beta = min(beta, v)
+            v = min(self.max_value(succ), v)
         return v
 
     def add_seen_state(self, game_state, agent_index):
@@ -102,23 +94,3 @@ class PacmanAgent(Agent):
         return (self.seen.count(
             (game_state.getFood(), game_state.getPacmanPosition(), game_state.getGhostPositions()[0],
              agent_index)) > 0)
-
-    def score_evaluation_function(self, current_game_state):
-        food_list = current_game_state.getFood().asList()
-        pacman_pos = current_game_state.getPacmanPosition()
-        food_nbr = len(food_list)
-
-        nearfooddist = 0
-        if [util.manhattanDistance(pacman_pos, xy2) for xy2 in food_list]:
-            food_dist_list = [util.manhattanDistance(current_game_state.getPacmanPosition(), xy2) for xy2 in food_list]
-            nearfooddist = min(food_dist_list)
-
-        ghost_pos = current_game_state.getGhostPosition(self.ghostIndex)
-        ghost_dist = 0
-        if util.manhattanDistance(pacman_pos, ghost_pos) == 0:
-            ghost_dist = self.infinity
-        else:
-            ghost_dist = util.manhattanDistance(pacman_pos, ghost_pos)
-
-        return - food_nbr * 10 - nearfooddist * 2 + current_game_state.getScore() - ghost_dist
-

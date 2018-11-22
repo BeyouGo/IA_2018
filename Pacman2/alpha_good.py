@@ -5,9 +5,6 @@ from pacman_module.game import Agent, random, Directions
 from pacman_module.pacman import GameState
 from pacman_module import util
 
-
-# totExpandedStates=0
-# sys.setrecursionlimit(1000)
 class PacmanAgent(Agent):
     def __init__(self, args):
         """
@@ -35,39 +32,46 @@ class PacmanAgent(Agent):
         # Get first pacman successors
         self.seen = []
         self.add_seen_state(s,0)
-        ## simulate pacman turn
+
+        # simulate pacman turn
         succsDirectionPair = s.generatePacmanSuccessors()
         succs = [succ[0] for succ in succsDirectionPair]
         moves = [succ[1] for succ in succsDirectionPair]
+
         # Compute value for each of the pacman moves
         v = [self.min_value(succ, 1, -1e80, 1e80) for succ in succs]
+
         # return best one
         maxV = max(v)
-        #print(str(moves) + " - " + str(v) + " <-> " + str(maxV))
         index = v.index(maxV)
         return moves[index]
 
+    # Pacman turn
     def max_value(self, game_state, agent_index, alpha, beta):
-        # print("enter to max")
+
+        # Check if game ended
         if game_state.isLose() or game_state.isWin():
             return self.scoreEvaluationFunction(game_state)
+
+        # Avoid Loops
         if self.already_seen_state(game_state, agent_index):
             if agent_index == self.pacmanIndex:
                 return -1e80
             else:
                 return 1e80
-        v = - 1e80
         self.add_seen_state(game_state, agent_index)
+
+        # Applying alphabeta pruning
+        v = - 1e80
         for (succ, move) in game_state.generatePacmanSuccessors():
             v = max((self.min_value(succ, (agent_index + 1) % 2, alpha, beta), v))
             if v >= beta:
                 return v
             alpha = max(alpha, v)
-        #print("Max with agent " + str(agent_index)+ " <-> "+str(v))
         return v
 
+    # Ghost turn
     def min_value(self, game_state, agent_index, alpha, beta):
-        # print("enter to min")
         if game_state.isLose() or game_state.isWin():
             return self.scoreEvaluationFunction(game_state)
         if self.already_seen_state(game_state, agent_index):
@@ -82,7 +86,6 @@ class PacmanAgent(Agent):
             if v <= alpha:
                 return v
             beta = min(beta, v)
-        #print("Min with agent " + str(agent_index) + " <-> "+str(v))
         return v
 
     def add_seen_state(self, game_state, agent_index):
