@@ -1,0 +1,19 @@
+Smarty :
+
+run_times = np.transpose(np.array([[0.0607, 0, 0], [0.0299, 0, 0], [0.0109, 0.5780, 1.3708]]))
+scores = np.transpose(np.array([[523, 0, 0], [523, 0, 0], [526, 539, 560]]))
+expendedNodes = np.transpose(np.array([[464, 0, 0], [246, 0, 0], [66, 2140, 4153]]))
+
+
+
+dumby :
+
+run_times = np.transpose(np.array([[0.0708, 0, 0], [0.03595, 0, 0], [0.0080, 0.7569, 1.8549]]))
+scores = np.transpose(np.array([[521, 0, 0], [521, 0, 0], [526, 539, 540]]))
+expendedNodes = np.transpose(np.array([[598, 0, 0], [342, 0, 0], [66, 2818, 6033]]))
+
+greedy :
+
+run_times = np.transpose(np.array([[0.0648, 0, 0], [0.0279, 0, 0], [0.0060, 0.6254, 1.3723]]))
+scores = np.transpose(np.array([[523, 0, 0], [523, 0, 0], [526, 539, 560]]))
+expendedNodes = np.transpose(np.array([[464, 0, 0], [246, 0, 0], [66, 2139, 4153]]))
